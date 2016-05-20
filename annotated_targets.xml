@@ -1,0 +1,26 @@
+<tool id="annotated_targets" name="annotate targets" description="" force_history_refresh="True" version="0.1.0">
+  <command>
+    pseq . loc-intersect --group refseq --locdb $locdb --file $exome --out output
+  	&amp;&amp;
+  	mv output.loci ${output}
+  	&amp;&amp;
+  	mv output.log ${log}
+  </command>
+  <inputs>
+    <param name="exome" type="data" format="txt" label="Design file" help=""/>
+    <param name="locdb" type="data" label="locdb" help=""/>
+    	</inputs>
+  
+  <outputs>
+    <data format="txt" name="output" label="annotated genes of ${on_string}" />
+	<data format="txt" name="log" label="log of annotated genes of ${on_string}" />    
+    </outputs>
+  
+   <help>
+   	
+**What it does**
+   	
+ 
+   	</help>
+</tool>
+

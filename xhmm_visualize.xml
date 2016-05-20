@@ -1,0 +1,45 @@
+<tool id="xhmm_visualize" name="xhmm visualisation" description="generate graphics" force_history_refresh="True" version="0.1.0">
+<command interpreter="Rscript">
+   xhmm_visualize.R ${DATA_RD} ${DATA_filtered_centered_RD} 
+					${DATA_RD_PCA} 
+					${DATA_RD_PCA_normalized} 
+					${DATA_RD_PCA_normalized_filtered_sample_zscores}
+					${DATA_same_filtered}
+					${DATA_posteriors} 
+					${DATA_xcnv} 
+					$__user_id__	
+					$__new_file_path__ 
+					$output	
+					$annotated_targets 
+					2> /dev/null
+  </command>
+  <inputs>
+    <param name="DATA_RD" type="data" format="txt" label="Raw read depth" help="Matrix of input read-depths, where rows (samples) and columns (targets) are labeled"/>
+   	<param name="DATA_filtered_centered_RD" type="data" format="txt" label="Filtered and centered read depth" help="Matrix of input read-depths after filetring and centering"/>
+   	<!--param name="DATA_filtered_centered_RD_filtered_target" type="data" format="txt" label="Filtered targets after filtering and centering" help="Matrix of input read-depths after filetring and centering"/>
+   	<param name="DATA_filtered_centered_RD_filtered_sample" type="data" format="txt" label="Filtered samples after filtering and centering" help="Matrix of input read-depths after filetring and centering"/-->
+   	<param name="DATA_RD_PCA" type="data" format="txt" label="PCA file" help="Matrix of input read-depths after filetring and centering"/>
+   	<param name="DATA_RD_PCA_normalized" type="data" format="txt" label="Matrix of normalized read depth" help="Matrix of input read-depths after filetring and centering"/>
+   	<param name="DATA_RD_PCA_normalized_filtered_sample_zscores" type="data" format="txt" label="Matrix of normalized, centered and filtered data" help="Matrix of input read-depths after filtering and centering"/>
+   	<param name="DATA_same_filtered" type="data" format="txt" label="Matrix of raw with same filtering of normalized data" help="Matrix of input read-depths after filetring and centering"/>
+   	<param name="DATA_posteriors" type="data" format="txt" label="Posteriors probabilities"  help="Matrix of input read-depths after filetring and centering"/>
+   	<param name="DATA_xcnv" type="data" format="txt" label="CNV calls"  help="Call of CNV"/>
+  	<param name="annotated_targets" type="data" format="txt" label="Annotated targets"  help="annotated targets"/>
+  
+   	</inputs>
+   
+  <outputs>
+    <data format="tar" name="output" label="graphics of ${on_string}" />
+  </outputs>
+   
+  
+   <help>
+   	
+**What it does**
+   	
+
+   	</help>
+</tool>
+
+
+

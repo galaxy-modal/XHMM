@@ -1,0 +1,91 @@
+<tool id="xhmm_genotype" name="xhmm genotype mode" description="Genotype list of CNVs from normalized read depth matrix" force_history_refresh="True" version="0.1.0">
+  <command>
+    xhmm 
+  		--genotype
+  		--discoverSomeQualThresh $discoverSomeQualThresh
+  		--gxcnv $gxcnv
+  		--vcf $vcf
+  		--subsegments $subsegments
+  		--maxTargetsInSubsegment $maxTargetsInSubsegment
+  		--genotypeQualThresholdWhenNoExact $genotypeQualThresholdWhenNoExact
+  		--maxNormalizedReadDepthVal $maxNormalizedReadDepthVal
+  		--maxQualScore $maxQualScore
+  		--scorePrecision $scorePrecision
+  		--auxUpstreamPrintTargs $auxUpstreamPrintTargs
+  		--auxDownstreamPrintTargs $auxDownstreamPrintTargs
+  		-r $input
+  		--referenceFASTA 
+  		--origReadDepths $origReadDepths
+  		--xcnv $xcnv
+  		--posteriorFiles $posteriorFiles
+		--aux_xcnv $aux_xcnv 2> $log
+  </command>
+  <inputs>
+    <param name="input" type="data" format="txt" label="Data read depth" help="Matrix of input read-depths, where rows (samples) and columns (targets) are labeled"/>
+   	<param name="origReadDepths" type="data" format="txt" label="Unnormalized read-depths" help="Matrix of unnormalized read-depths to use for CNV annotation, where rows (samples) and columns (targets) are labeled"/>
+   	<param name="gxcnv" type="data" format="txt" label="xhmm CNV input file" help=" xhmm CNV input file to genotype in 'readDepths' sample" />
+   	<param name="referenceFASTA" type="data" format="fasta" label="reference FASTA" help="Reference FASTA file"/>
+   	
+   	<param name="maxTargetsInSubsegment" type="integer" value="30" min="0" label="Maximum targets in sub-segment" help="When genotyping sub-segments of input intervals, only consider sub-segments consisting of this number of targets or fewer (default=`30') "/>
+    <param name="genotypeQualThresholdWhenNoExact" type="float" value="20" label="Quality threshold for calling a genotype" help="Quality threshold for calling a genotype, used *ONLY* when 'gxcnv' does not contain the 'Q_EXACT' field for the interval being genotyped  (default=`20')"/>
+    <param name="maxNormalizedReadDepthVal" type="float" value="10" label="Maximum normalized Read depth value" help="Value at which to cap the absolute value of *normalized* input read depth values ('readDepths')  (default=`10')"/>
+       	
+    <param name="discoverSomeQualThresh" type="float" value="30" label="Quality Threshold for CNV" help="Quality threshold for discovering a CNV in a sample  (default=`30')"/>
+    <param name="maxNormalizedReadDepthVal" type="float" value="10" label="Cap of the absolute value of *normalized* read depth" help="Value at which to cap the absolute value of *normalized* input read depth values ('readDepths')  (default=`10')"/>
+    
+    <param name="maxQualScore" type="float" value="99" label="Quality scores cap" help="Value at which to cap the calculated quality scores  (default=`99')"/>
+    <param name="scorePrecision" type="integer" value="0" min="0" max="10" label="precision of quality scores" help="Decimal precision of quality scores "/>
+    <param name="auxUpstreamPrintTargs" type="integer" value="2" min="0" label="Number of targets to print upstream of CNV" help="Number of targets to print upstream of CNV in Auxiliary CNV output file (default=`2') "/>
+    <param name="auxDownstreamPrintTargs" type="integer" value="2" min="0" label="Number of targets to print downstream of CNV" help="Number of targets to print downstream of CNV in Auxiliary CNV output file (default=`2') "/>
+  
+    <param name="CNVrate" type="float" value="0.00000001" label="Exome-wide CNV rate"/>
+    <param name="meanNbrTargetCNV" type="integer" value="6" label="Mean number of targets in CNV"/>
+	<param name="meanDist" type="integer" value="70" label="Mean distance between targets within CNV (in KB)"/>
+	<param name="meanZdeletion" type="float" value="-3" label="Mean of DELETION z-score distribution"/>
+	<param name="meanZdiploid" type="float" value="0" label="Mean of DIPLOID z-score distribution"/>
+	<param name="meanZduplication" type="float" value="3" label="Mean of DUPLICATION z-score distribution"/>
+	<param name="stdZdeletion" type="float" value="-1" label="Standard deviation of DELETION z-score distribution"/>
+	<param name="stdZdiploid" type="float" value="1" label="Standard deviation of DIPLOID z-score distribution"/>
+	<param name="stdZduplication" type="float" value="1" label="Standard deviationof DUPLICATION z-score distribution"/>	 </inputs>
+  
+  <outputs>
+    <data format="txt" name="output" label="filter samples and target of ${on_string}" />
+	<data format="vcf" name="vcf" label="Genotyped CNV output VCF file" />
+	<data format="txt" name="aux_xcnv" label="Auxiliary CNV output file of ${on_string}" />
+	<data format="txt" name="log" label="log of CNV discover of ${on_string}" />
+   
+  </outputs>
+  	
+  	<configfiles>
+	<configfile name="paramFile">
+  	${CNVrate} ${meanNbrTargetCNV} ${meanDist} ${meanZdeletion} ${stdZdeletion}	${meanZdiploid} ${stdZdiploid} ${meanZduplication} ${stdZduplication}
+  	</configfile>
+  </configfiles>
+  
+   <help>
+   	
+**What it does**
+   	
+  Mode: genotype
+  Genotype list of CNVs from normalized read depth matrix
+   	
+  -G, --genotype                                Matrix is read from --readDepths argument
+  -g, --gxcnv=STRING                            xhmm CNV input file to genotype in 'readDepths' sample
+  -F, --referenceFASTA=STRING                   Reference FASTA file (MUST have .fai index file)
+  -v, --vcf=STRING                              Genotyped CNV output VCF file  (default=`-')
+  --subsegments                                 In addition to genotyping the intervals specified in gxcnv, genotype all sub-segments of these intervals (with maxTargetsInSubsegment or fewer targets) (default=off)
+  --maxTargetsInSubsegment=INT                  When genotyping sub-segments of input intervals, only consider sub-segments consisting of this number of targets or fewer (default=`30')
+  -T, --genotypeQualThresholdWhenNoExact=DOUBLE Quality threshold for calling a genotype, used *ONLY* when 'gxcnv' does not contain the 'Q_EXACT' field for the interval being genotyped  (default=`20')
+  -m, --maxNormalizedReadDepthVal=DOUBLE        Value at which to cap the absolute value of *normalized* input read depth values ('readDepths')  (default=`10')
+  -q, --maxQualScore=DOUBLE                     Value at which to cap the calculated quality scores (default=`99')
+  -e, --scorePrecision=INT                      Decimal precision of quality scores (default=`0')
+  -a, --aux_xcnv=STRING                         Auxiliary CNV output file (may be VERY LARGE in 'genotype' mode)
+  -u, --auxUpstreamPrintTargs=INT               Number of targets to print upstream of CNV in 'auxOutput' file  (default=`2')
+  -w, --auxDownstreamPrintTargs=INT             Number of targets to print downstream of CNV in 'auxOutput' file  (default=`2')
+  -R, --origReadDepths=STRING                   Matrix of unnormalized read-depths to use for CNV annotation, where rows (samples) and columns (targets) are labeled
+  -p, --paramFile=STRING                        (Initial) model parameters file
+   	</help>
+</tool>
+
+
+

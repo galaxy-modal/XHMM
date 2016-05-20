@@ -1,0 +1,30 @@
+<tool id="xhmm_pca" name="xhmm pca mode" description="Run PCA to create normalization factors for read depth matrix" force_history_refresh="True" version="0.1.0">
+  <command>
+    xhmm 
+  		--PCA
+  		-r $input 
+  	    --PCAfiles $output 2> $log
+  		
+  </command>
+  <inputs>
+    <param name="input" type="data" format="txt" label="Data read depth" help=" Matrix of *input* read-depths, where rows (samples) and columns (targets) are labeled"/>
+    </inputs>
+  
+  <outputs>
+    <data format="txt" name="output" label="PCA of ${on_string}" />
+	<data format="txt" name="log" label="log of PCA of ${on_string}" />    
+    </outputs>
+  
+   <help>
+   	
+**What it does**
+   	
+  XHMM Mode: PCA
+  Run PCA to create normalization factors for read depth matrix
+  
+  -P, --PCA                     Matrix is read from --readDepths argument; 
+                                  normalization factors sent to --PCAfiles 
+                                  argument
+  --PCAfiles=STRING Base file name for 'PCA' *output*
+   	</help>
+</tool>

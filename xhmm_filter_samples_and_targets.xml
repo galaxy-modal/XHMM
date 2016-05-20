@@ -1,0 +1,149 @@
+<tool id="xhmm_matrix" name="xhmm matrix mode" description="Process (filter, center, etc.) a read depth matrix and output the resulting matrix" force_history_refresh="True" version="0.1.0">
+  <command>xhmm --matrix 
+  		-r $input 
+  	    #if $excludeTargets.excludeTargetsBoolean: 
+  			--excludeTargets $excludeTargetsFile 
+  		#end if
+  		#if $excludeSamples.excludeSamplesBoolean: 
+  			--excludeSamples $excludeSamplesFile 
+  		#end if
+  		
+  		#if $center.centerData:
+  			--centerData
+  			--centerType $center.centerType
+  			${center.zScoreData}
+  		#end if
+  		#if str($minTargetSize) != "" :
+  		--minTargetSize $minTargetSize
+  		#end if
+  		#if str($maxTargetSize) != "" :
+  	    --maxTargetSize $maxTargetSize
+  		#end if
+  		#if str($minMeanTargetRD) !="" :
+  		--minMeanTargetRD $minMeanTargetRD
+  		#end if
+  		#if str($maxMeanTargetRD) !="" :
+  		--maxMeanTargetRD $maxMeanTargetRD
+  		#end if
+  		#if str($minMeanSampleRD) !="" :
+  		--minMeanSampleRD $minMeanSampleRD
+  		#end if
+  		#if str($maxMeanSampleRD) !="" :
+  		--maxMeanSampleRD $maxMeanSampleRD
+  		#end if
+  	    #if str($minSdTargetRD) !="" :
+  		--minSdTargetRD $minSdTargetRD
+  		#end if
+  		#if str($maxSdTargetRD) !="" :
+  	    --maxSdTargetRD $maxSdTargetRD
+  		#end if
+  	    #if str($minSdSampleRD) !="" :
+  		--minSdSampleRD $minSdSampleRD
+  		#end if
+  		#if str($maxSdSampleRD) !="" :
+  	 	--maxSdSampleRD $maxSdSampleRD
+  		#end if
+  		-o $output
+  		--outputExcludedTargets $outputExludeTargets
+  		--outputExcludedSamples $outputExcludeSamples  2> $log
+  	</command>
+  <inputs>
+    <param name="input" type="data" format="txt" label="Data read depth" help=" Matrix of *input* read-depths, where rows (samples) and columns (targets) are labeled"/>
+    <conditional name="excludeTargets">
+    	<param name="excludeTargetsBoolean" type="boolean" checked="false" truevalue="--excludeTargets" falsevalue="" label="Exclude Targets"/>
+    	<when value="--excludeTargets">
+    		<param name="excludeTargetsFile" type="data" format="txt" label="Targets to exclude" help=" File of targets to exclude"/>
+		</when>    	
+    </conditional>
+    <conditional name="excludeSamples">
+    	<param name="excludeSamplesBoolean" type="boolean" checked="false" truevalue="--excludeSamples" falsevalue="" label="Exclude Samples"/>
+    	<when value="--excludeSamples">
+       		<param name="excludeSamplesFile" type="data" format="txt" label="Samples to exclude" help=" File of samples to exclude"/>
+    	</when>
+    </conditional>
+   
+    
+    <conditional name="center">
+      <param name="centerData" type="boolean" checked="false" truevalue="--centerData" falsevalue="" label="Center Data" help="Output sample- or target- centered read-depth matrix (as per --centerType)  (default=off)"/>
+      <when value="--centerData">
+        <param name="centerType" type="select" label="Center type" help="If --centerData given, then center the data around this dimension  (possible values=target, sample)">
+        	<option value="target">Target</option>
+        	<option value="sample">Sample</option>
+		</param>
+		<param name="zScoreData" type="boolean" checked="false" truevalue="--zScoreData" falsevalue="" label="z-score data" help="If --centerData given, then additionally normalize by standard deviation (outputting z-scores)  (default=off)"/>
+	   </when>
+    </conditional>
+    	
+    <param name="minTargetSize" type="integer" optional="true" value="" label="Min target size" help="Minimum size of target (in bp) to process (default=`0')"/>
+    <param name="maxTargetSize" type="integer" optional="true" value="" label="Max target size" help="Maximum size of target (in bp) to process"/>
+    <param name="minMeanTargetRD" type="float" optional="true" value="" label="Min target mean read depth" help="Minimum per-target mean RD to require for target to be processed"/>
+    <param name="maxMeanTargetRD" type="float" optional="true" value="" label="Max target mean read depth" help="Maximum per-target mean RD to require for target to be processed"/>
+	<param name="minMeanSampleRD" type="float" optional="true" value="" label="Min sample mean read depth" help="Minimum per-sample mean RD to require for sample to be processed"/>
+    <param name="maxMeanSampleRD" type="float" optional="true" value="" label="Max sample mean read depth" help="Maximum per-sample mean RD to require for sample to be processed"/>
+	<param name="minSdTargetRD" type="float" optional="true" value="" label="Min target standard deviation read depth" help="Maximum per-sample standard deviation of RD to require for target to be processed (default=`0')"/>
+    <param name="maxSdTargetRD" type="float" optional="true" value="" label="Max target standard deviation read depth" help="Maximum per-sample standard deviation of RD to require for target to be processed"/>
+    <param name="minSdSampleRD" type="float" optional="true" value="" label="Min sample standard deviation read depth" help="Maximum per-sample standard deviation of RD to require for sample to be processed"/>
+    <param name="maxSdSampleRD" type="float" optional="true" value="" label="Max sample standard deviation read depth" help="Maximum per-sample standard deviation of RD to require for sample to be processed"/>
+ 
+   		 	
+    </inputs>
+  
+  <outputs>
+    <data format="txt" name="output" label="filter samples and target of ${on_string}" />
+    <data format="txt" name="outputExludeTargets" label="Excluded targets of ${on_string}" />
+    <data format="txt" name="outputExcludeSamples" label="Excluded samples of ${on_string}" />  
+    <data format="txt" name="log" label="log of ${on_string}" />   
+  </outputs>
+   <stdio>
+    <exit_code range="1:"   level="fatal"   description="See logs for more details" />
+   </stdio>
+   <help>
+   	
+**What it does**
+   	
+  XHMM 	Mode: matrix
+  Process (filter, center, etc.) a read depth matrix and output the resulting 
+  matrix.  Note that first all excluded samples and targets are removed.  And, 
+  sample statistics used for filtering are calculated only *after* filtering 
+  out relevant targets.
+   	
+  -M, --matrix                  
+      --excludeTargets=STRING   File(s) of targets to exclude
+      --excludeChromosomeTargets=STRING
+                                Target chromosome(s) to exclude
+      --excludeSamples=STRING   File(s) of samples to exclude
+      --minTargetSize=INT       Minimum size of target (in bp) to process  
+                                  (default=`0')
+      --maxTargetSize=INT       Maximum size of target (in bp) to process
+      --minMeanTargetRD=DOUBLE  Minimum per-target mean RD to require for 
+                                  target to be processed
+      --maxMeanTargetRD=DOUBLE  Maximum per-target mean RD to require for 
+                                  target to be processed
+      --minSdTargetRD=DOUBLE    Minimum per-target standard deviation of RD to 
+                                  require for target to be processed  
+                                  (default=`0')
+      --maxSdTargetRD=DOUBLE    Maximum per-target standard deviation of RD to 
+                                  require for target to be processed
+      --minMeanSampleRD=DOUBLE  Minimum per-sample mean RD to require for 
+                                  sample to be processed
+      --maxMeanSampleRD=DOUBLE  Maximum per-sample mean RD to require for 
+                                  sample to be processed
+      --minSdSampleRD=DOUBLE    Minimum per-sample standard deviation of RD to 
+                                  require for sample to be processed  
+                                  (default=`0')
+      --maxSdSampleRD=DOUBLE    Maximum per-sample standard deviation of RD to 
+                                  require for sample to be processed
+      --centerData              Output sample- or target- centered read-depth 
+                                  matrix (as per --centerType)  (default=off)
+      --centerType=ENUM         If --centerData given, then center the data 
+                                  around this dimension  (possible 
+                                  values="target", "sample")
+      --zScoreData              If --centerData given, then additionally 
+                                  normalize by standard deviation (outputting 
+                                  z-scores)  (default=off)
+      --outputExcludedTargets=STRING  File in which to output targets excluded by some criterion
+      --outputExcludedSamples=STRING  File in which to output samples excluded by some criterion
+	  -o, --outputMatrix=STRING  Read-depth matrix output file  (default=`-')
+
+   	</help>
+</tool>

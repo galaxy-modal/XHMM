@@ -1,0 +1,79 @@
+<tool id="xhmm_normalize" name="xhmm normalize mode" description=" Apply PCA factors in order to normalize read depth matrix" force_history_refresh="True" version="0.1.0">
+  <command>
+    xhmm 
+  		--normalize
+  		-r $input
+  		--PCAfiles $PCAfiles 
+  	    --normalizeOutput $output
+  		--PCnormalizeMethod $method.PCnormalizeMethod
+  		#if $method.PCnormalizeMethod == 'numPCtoRemove' :
+  		--numPCtoRemove $numPCtoRemove
+  		#end if
+  		#if $method.PCnormalizeMethod == 'PVE_mean_factor' :
+  		--PVE_mean_factor $PVE_mean_factor
+  		#end if
+  		#if $method.PCnormalizeMethod == 'PVE_contrib' :
+  		--PVE_contrib $PVE_contrib 
+  		#end if
+  		2>$log
+  		
+  </command>
+  <inputs>
+  	<param name="input" type="data" format="txt" label="Data read depth" help=" Matrix of *input* read-depths, where rows (samples) and columns (targets) are labeled"/>
+   	<param name="PCAfiles" type="data" format="txt" label="Base file name" help="Base file name input"/>
+   	<conditional name="method">
+   	<param name="PCnormalizeMethod" type="select" label="Principal components normalization method" help="Method to choose which prinicipal components are removed for data normalization  (possible values=numPCtoRemove, PVE_mean, PVE_contrib default=PVE_mean)">
+      <option value="PVE_mean">PVE_mean</option>
+      <option value="PVE_contrib">PVE_contrib</option>
+      <option value="numPCtoRemove">numPCtoRemove</option>
+    </param>
+   	<when value="numPCtoRemove">
+    	<param name="numPCtoRemove" type="integer" value="20" label="Number of PC to filter out" help="Number of highest principal components to filter out  (default=`20')"/>
+    </when>
+    <when value="PVE_mean">
+    	<param name="PVE_mean_factor" type="float" value="0.7" label="Threshold of explained variance" help="Remove all principal components that individually explain more variance than this factor times the average (in the original PCA-ed data) (default=`0.7')"/>
+    </when>
+    <when value="PVE_contrib">
+    	<param name="PVE_contrib" type="float" value="50" min="0" max="100" label="Max target mean read depth" help="Remove the smallest number of principal components that explain this percent of the variance (in the original PCA-ed data)  (default=`50')"/>
+ 	</when> 
+    </conditional>
+     </inputs>
+  
+  <outputs>
+    <data format="txt" name="output" label="normalization of ${on_string}" />
+	<data format="txt" name="log" label="log of normalization of ${on_string}" />    
+  </outputs>
+  <stdio>
+    <exit_code range="1:"   level="fatal"   description="See logs for more details" />
+  </stdio>
+   <help>
+   	
+**What it does**
+   	
+ Mode: normalize
+  Apply PCA factors in order to normalize read depth matrix
+  -N, --normalize               Matrix is read from --readDepths argument; 
+                                  normalization factors read from --PCAfiles 
+                                  argument
+  
+  -n, --normalizeOutput=STRING  Normalized read-depth matrix output file  
+                                  (default=`-')
+   	  --PCAfiles=STRING         Base file name input   	
+      --PCnormalizeMethod=ENUM  Method to choose which prinicipal components 
+                                  are removed for data normalization  (possible 
+                                  values="numPCtoRemove", "PVE_mean", 
+                                  "PVE_contrib" default=`PVE_mean')
+      --numPCtoRemove=INT       Number of highest principal components to 
+                                  filter out  (default=`20')
+      --PVE_mean_factor=DOUBLE  Remove all principal components that 
+                                  individually explain more variance than this 
+                                  factor times the average (in the original 
+                                  PCA-ed data)  (default=`0.7')
+      --PVE_contrib=DOUBLE      Remove the smallest number of principal 
+                                  components that explain this percent of the 
+                                  variance (in the original PCA-ed data)  
+                                  (default=`50')
+
+   	</help>
+</tool>
+
